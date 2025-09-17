@@ -9,16 +9,14 @@ const app = express()
 app.use(morgan('dev'))  //dev combined common short tiny
 app.use(helmet())
 app.use(compression())
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
 //init db
 require('./models/init.mongodb')
 const {checkOverload} = require('./helpers/check.connect')
 //checkOverload()
+
 //init router
-app.get('/', (req, res, next) => {
-    {
-        return res.status(200).json({
-            message: 'Welcome to'
-        })
-    }
-})
+app.use(require('./routes/index'))
+
 module.exports = app
