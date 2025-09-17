@@ -3,6 +3,7 @@
 ###signUp
 POST {{url_dev}}/shop/signup
 Content-Type: application/json
+x-api-key: 26efde155a475c272e86b3aaa85d59a60548e3a32cba89d4061fa6e0b31151f216dce8d65ff62017b863b9465dd7c283cd1f2ec03f8f6dc4a47fcb3d962b0c38
 
 {
     "name": "Shop Tips",
