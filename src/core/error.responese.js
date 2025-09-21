@@ -5,7 +5,7 @@ const StatusCode = {
     CONFLICT: 409
 }
 
-const REASONSTATUSCODE = {
+const ReasonStatusCode = {
     FORBIDDEN: 'Bad request error',
     CONFLICT: 'Conflict error'
 }
@@ -20,14 +20,14 @@ class ErrorResponese extends Error {
 
 class ConflictRequestError extends ErrorResponese {
 
-    constructor( message = REASONSTATUSCODE.CONFLICT, statusCode = StatusCode.FORBIDDEN) {
+    constructor( message = ReasonStatusCode.CONFLICT, statusCode = StatusCode.FORBIDDEN) {
         super(message, statusCode)
     }
 }
 
 class BadRequestError extends ErrorResponese {
 
-     constructor( message = REASONSTATUSCODE.CONFLICT, statusCode = StatusCode.FORBIDDEN) {
+     constructor( message = ReasonStatusCode.CONFLICT, statusCode = StatusCode.FORBIDDEN) {
         super(message, statusCode)
     }
 }
