@@ -1,38 +1,40 @@
 'use strict'
 
 const StatusCode = {
-    FORBIDDEN: 403,
-    CONFLICT: 409
+  FORBIDDEN: 403,
+  CONFLICT: 409,
+  BAD_REQUEST: 400,
+  INTERNAL_ERROR: 500
 }
 
 const ReasonStatusCode = {
-    FORBIDDEN: 'Bad request error',
-    CONFLICT: 'Conflict error'
+  FORBIDDEN: 'Forbidden',
+  CONFLICT: 'Conflict',
+  BAD_REQUEST: 'Bad Request',
+  INTERNAL_ERROR: 'Internal Server Error'
 }
 
-class ErrorResponese extends Error {
-
-    constructor(message, status) {
-        super(message)
-        this.status = status
-    }
+class ErrorResponse extends Error {
+  constructor(message, statusCode, reasonStatus) {
+    super(message)
+    this.status = statusCode
+    this.reason = reasonStatus
+  }
 }
 
-class ConflictRequestError extends ErrorResponese {
-
-    constructor( message = ReasonStatusCode.CONFLICT, statusCode = StatusCode.FORBIDDEN) {
-        super(message, statusCode)
-    }
+class ConflictRequestError extends ErrorResponse {
+  constructor(message = ReasonStatusCode.CONFLICT) {
+    super(message, StatusCode.CONFLICT, ReasonStatusCode.CONFLICT)
+  }
 }
 
-class BadRequestError extends ErrorResponese {
-
-     constructor( message = ReasonStatusCode.CONFLICT, statusCode = StatusCode.FORBIDDEN) {
-        super(message, statusCode)
-    }
+class BadRequestError extends ErrorResponse {
+  constructor(message = ReasonStatusCode.BAD_REQUEST) {
+    super(message, StatusCode.BAD_REQUEST, ReasonStatusCode.BAD_REQUEST)
+  }
 }
 
 module.exports = {
-    ConflictRequestError,
-    BadRequestError
+  ConflictRequestError,
+  BadRequestError
 }
