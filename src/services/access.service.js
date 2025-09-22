@@ -6,8 +6,10 @@ const KeyTokenService = require('./keyToken.service')
 const { createTokenPair } = require('../auth/authUtils')
 const { getInfoData } = require('../utils')
 const { type } = require('os')
-const { BadRequestError, ConflictRequestError } = require('../core/error.responese')
+const { BadRequestError, ConflictRequestError, AuthFailureError } = require('../core/error.responese')
 const { token } = require('morgan')
+const { findByEmail } = require('./shop.service')
+const e = require('express')
 const RoleShop = {
     SHOP: 'SHOP',
     WRITER: 'WRITER',
@@ -15,11 +17,39 @@ const RoleShop = {
     ADMIN: 'ADMIN'
 }
 class AccessService {
+    static login = async ({ email, password, refreshToken = null }) => {
+        /*
+            1 - check email in dbs
+            2 - match password
+            3 - create accessToken, refreshToken and save
+            4 - generate tokens
+            5 - get data return login
+        */
+        //step1
+        const foundShop = await findByEmail({ email })
+        if (!foundShop) throw new BadRequestError('Shop is not registered')
+
+        //step2
+        const match = await bcrypt.compare(password, foundShop.password)
+        if (!match) throw AuthFailureError('Authentication error')
+
+        //step3
+        const privateKey = crypto.randomBytes(64).toString('hex')
+        const publicKey = crypto.randomBytes(64).toString('hex')
+
+        //step4
+        const tokens = await createTokenPair({ user: foundShop._id, email: foundShop.email }, publicKey, privateKey)
+ 
+        await KeyTokenService.createKeyToken({userId: foundShop._id, publicKey, privateKey, refreshToken: tokens.refreshToken})
+        //step5
+        return {
+            shop: getInfoData({ fileds: ['_id', 'name', 'email'], object: foundShop }),
+            tokens
+        }
+    }
     static signUp = async ({ name, email, password }) => {
 
-
         //step1: check email exists?
-
         const holderShop = await shopModel.findOne({ email }).lean()
         if (holderShop) {
             throw new BadRequestError('Error: Shop already registered !')
@@ -40,22 +70,22 @@ class AccessService {
         const privateKey = crypto.randomBytes(64).toString('hex')
         const publicKey = crypto.randomBytes(64).toString('hex')
 
-        console.log('Genarated keys ::: ', {privateKey, publicKey})
+        console.log('Genarated keys ::: ', { privateKey, publicKey })
 
         //step5: save key to keyStore
         const keyStore = await KeyTokenService.createKeyToken({
-                userId: newShop._id,
-                publicKey,
-                privateKey
+            userId: newShop._id,
+            publicKey,
+            privateKey
         })
 
-        if(!keyStore) {
+        if (!keyStore) {
             throw new BadRequestError('Error::: Cannot create key store')
         }
 
         //step6: create accesstoken + refreshToken
         const tokens = await createTokenPair(
-            {userId: newShop._id, email},
+            { userId: newShop._id, email },
             publicKey,
             privateKey
         )
