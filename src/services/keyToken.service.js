@@ -2,9 +2,9 @@
 
 const { filter, update } = require('lodash')
 const keyTokenModel = require('../models/keytoken.model')
-
+const { Types } = require('mongoose')
 class KeyTokenService {
-    static createKeyToken = async ({userId, publicKey, privateKey, refreshToken}) => {
+    static createKeyToken = async ({ userId, secretKey, refreshToken }) => {
         try {
             //level 0
             // const publicKeyString = publicKey.toString()    //publickey duoc tao ra la hash nen can chuyen qua string de luu vao database
@@ -13,15 +13,24 @@ class KeyTokenService {
             //     publicKey,
             //     privateKey
             // })  
-            const filter = {user: userId}, update = {
-                publicKey,privateKey, refreshTokensUsed: [], refreshToken
-            }, options = {upsert: true, new: true}
+            const filter = { user: userId }, update = {
+                secretKey, refreshTokensUsed: [], refreshToken
+            }, options = { upsert: true, new: true }
             const tokens = await keyTokenModel.findOneAndUpdate(filter, update, options)
 
-            return tokens ? tokens.publicKey : null
+            return tokens ? tokens.secretKey : null
         } catch (error) {
             return error
         }
+    }
+
+
+    static findByUserId = async (userId) => {
+        return await keyTokenModel.findOne({ user: new Types.ObjectId(userId) }).lean()
+    }
+
+    static removeKeyById = async (_id) => {
+        return await keyTokenModel.deleteOne({ _id })
     }
 }
 

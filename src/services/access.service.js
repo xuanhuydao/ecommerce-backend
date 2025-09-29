@@ -6,7 +6,7 @@ const KeyTokenService = require('./keyToken.service')
 const { createTokenPair } = require('../auth/authUtils')
 const { getInfoData } = require('../utils')
 const { type } = require('os')
-const { BadRequestError, ConflictRequestError, AuthFailureError } = require('../core/error.responese')
+const { BadRequestError, ConflictRequestError, AuthFailureError } = require('../core/error.response')
 const { token } = require('morgan')
 const { findByEmail } = require('./shop.service')
 const e = require('express')
@@ -31,22 +31,30 @@ class AccessService {
 
         //step2
         const match = await bcrypt.compare(password, foundShop.password)
-        if (!match) throw AuthFailureError('Authentication error')
+        if (!match) throw new AuthFailureError('Authentication error')
 
         //step3
-        const privateKey = crypto.randomBytes(64).toString('hex')
-        const publicKey = crypto.randomBytes(64).toString('hex')
+        // const privateKey = crypto.randomBytes(64).toString('hex')
+        // const publicKey = crypto.randomBytes(64).toString('hex')
+        const secretKey = crypto.randomBytes(64).toString('hex');
 
         //step4
-        const tokens = await createTokenPair({ user: foundShop._id, email: foundShop.email }, publicKey, privateKey)
- 
-        await KeyTokenService.createKeyToken({userId: foundShop._id, publicKey, privateKey, refreshToken: tokens.refreshToken})
+        const tokens = await createTokenPair({ user: foundShop._id, email: foundShop.email }, secretKey)
+
+        await KeyTokenService.createKeyToken({ userId: foundShop._id, secretKey, refreshToken: tokens.refreshToken })
         //step5
         return {
-            shop: getInfoData({ fileds: ['_id', 'name', 'email'], object: foundShop }),
+            shop: getInfoData({ fields: ['_id', 'name', 'email'], object: foundShop }),
             tokens
         }
     }
+
+    static logout = async ({ keyStore }) => {
+        const keyDeleted = await KeyTokenService.removeKeyById(keyStore._id)
+        console.log(keyDeleted)
+        return keyDeleted
+    }
+
     static signUp = async ({ name, email, password }) => {
 
         //step1: check email exists?
@@ -67,16 +75,16 @@ class AccessService {
         }
 
         //step4 create publicKey, privateKey
-        const privateKey = crypto.randomBytes(64).toString('hex')
-        const publicKey = crypto.randomBytes(64).toString('hex')
+        // const privateKey = crypto.randomBytes(64).toString('hex')
+        // const publicKey = crypto.randomBytes(64).toString('hex')
+        const secretKey = crypto.randomBytes(64).toString('hex')
 
-        console.log('Genarated keys ::: ', { privateKey, publicKey })
+        console.log('Genarated keys ::: ', secretKey)
 
         //step5: save key to keyStore
         const keyStore = await KeyTokenService.createKeyToken({
             userId: newShop._id,
-            publicKey,
-            privateKey
+            secretKey
         })
 
         if (!keyStore) {
@@ -86,15 +94,14 @@ class AccessService {
         //step6: create accesstoken + refreshToken
         const tokens = await createTokenPair(
             { userId: newShop._id, email },
-            publicKey,
-            privateKey
+            secretKey
         )
         console.log('Created token success::: ', tokens)
 
         //step7 return data
         return {
             shop: getInfoData({
-                fileds: ['_id', 'name', 'email'],
+                fields: ['_id', 'name', 'email'],
                 object: newShop
             }),
             tokens
@@ -136,7 +143,7 @@ class AccessService {
         //     return {
         //         code: 201,
         //         metadata: {
-        //             shop: getInfoData({ fileds: ['_id', 'name', 'email'], object: newShop }),
+        //             shop: getInfoData({ fields: ['_id', 'name', 'email'], object: newShop }),
         //             tokens
         //         }
         //     }

@@ -12,13 +12,9 @@ var keyTokenSchema = new Schema({
         required: true,
         ref: 'Shop'
     },
-    publicKey: {
+    secretKey: {
         type: String,
         required: true,
-    },
-    privateKey: {
-        type: String,
-        require: true
     },
     refreshTokensUsed: {
         type: Array,
