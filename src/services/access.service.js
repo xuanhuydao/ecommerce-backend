@@ -161,7 +161,7 @@ class AccessService {
         if (foundToken) {
             //decode xem userid nao
             const { userId, email } = await verifyJWT(refreshToken, foundToken.secretKey)
-            console.log({userId, email})
+            console.log({ userId, email })
             //xoa tat ca token trong keystore
             await KeyTokenService.deleteKeyById(userId)
             throw new ForbiddenError('Something wrong happend, pls relogin !')
@@ -169,60 +169,59 @@ class AccessService {
 
         //
         const holderToken = await KeyTokenService.findByRefreshToken(refreshToken)
-        if(!holderToken) throw new AuthFailureError('Shop not registered ! 1')
+        if (!holderToken) throw new AuthFailureError('Shop not registered ! 1')
 
         //verify token
         const { userId, email } = await verifyJWT(refreshToken, holderToken.secretKey)
-        console.log('[2] -- ',{userId, email})
+        console.log('[2] -- ', { userId, email })
         //check userId
-        const foundShop = await findByEmail({email})
-        if(!foundShop) throw new AuthFailureError('Shop not registered ! 2')
+        const foundShop = await findByEmail({ email })
+        if (!foundShop) throw new AuthFailureError('Shop not registered ! 2')
 
         //create 1 cap token moi
-        const tokens = await createTokenPair({userId, email}, holderToken.secretKey)
+        const tokens = await createTokenPair({ userId, email }, holderToken.secretKey)
 
         //update token
         await keytokenModel.updateOne(
-           { _id: holderToken._id},
-           {
-            $set: {refreshToken: tokens.refreshToken},
-            $addToSet: {refreshTokensUsed: refreshToken}
-           }
+            { _id: holderToken._id },
+            {
+                $set: { refreshToken: tokens.refreshToken },
+                $addToSet: { refreshTokensUsed: refreshToken }
+            }
         )
 
         return {
-            user: {userId, email},
+            user: { userId, email },
             tokens
         }
     }
 
-    static handlerRefreshTokenV2 = async({ keyStore, user, refreshToken }) => {
+    static handlerRefreshTokenV2 = async ({ keyStore, user, refreshToken }) => {
         const { userId, email } = user
-
-        if(keyStore.refreshTokensUsed.includes(refreshToken)) {
+        console.log({ keyStore, user, refreshToken })
+        if (keyStore.refreshTokensUsed.includes(refreshToken)) {
             await KeyTokenService.deleteKeyById(userId)
             throw new ForbiddenError('Some thing wrong happend, pls relogin')
         }
 
-        if(keyStore.refreshToken !== refreshToken) throw new AuthFailureError('Shop not registered')
+        if (keyStore.refreshToken !== refreshToken) throw new AuthFailureError('Shop not registered')
 
-        const foundShop = await findByEmail({email})
-        if(!foundShop) throw new AuthFailureError('Shop not registered 2 ')
+        const foundShop = await findByEmail({ email })
+        if (!foundShop) throw new AuthFailureError('Shop not registered 2 ')
 
         //create 1 cap token moi
-        const tokens = await createTokenPair({user, email}, holderToken.secretKey)
+        const tokens = await createTokenPair({ userId, email }, keyStore.secretKey)
 
         //update token
-        await keytokenModel.updateOne(
-           { _id: holderToken._id},
+        await keyStore.updateOne(
            {
-            $set: {refreshToken: tokens.refreshToken},
-            $addToSet: {refreshTokensUsed: refreshToken}
-           }
+                $set: { refreshToken: tokens.refreshToken },
+                $addToSet: { refreshTokensUsed: refreshToken }
+            }
         )
 
         return {
-            user: {user, email},
+            user,
             tokens
         }
     }
