@@ -23,6 +23,16 @@ class ProductController {
         }).send(res)
     }
 
+    publishProductByShop = async (req, res, next) => {
+        new Successresponse({
+            message: 'Publish product success!',
+            metadata: await ProductServiceV2.publishProductByShop({
+                product_id: req.params.id,
+                product_shop: req.user.userId
+            })
+        }).send(res)
+    }
+
     //query
     /**
      * @description get all drafts for shop
@@ -35,6 +45,15 @@ class ProductController {
         new Successresponse({
             message: 'Get list draft success !',
             metadata: await ProductServiceV2.findAllDraftsForShop({
+                product_shop: req.user.userId
+            })
+        }).send(res)
+    }
+
+    getAllPublishForShop = async (req, res, next) => {
+        new Successresponse({
+            message: 'Get list published success !',
+            metadata: await ProductServiceV2.findAllPublishForShop({
                 product_shop: req.user.userId
             })
         }).send(res)

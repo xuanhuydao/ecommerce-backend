@@ -2,7 +2,7 @@
 
 const { product, clothing, electronic, furniture } = require('../models/product.model')
 const { BadRequestError } = require('../core/error.response')
-const { findAllDraftsForShop } = require('../models/reposirories/product.repo')
+const { findAllDraftsForShop, publishProductByShop, findAllPublishForShop } = require('../models/reposirories/product.repo')
 //define Factory class to create product
 class ProductFactory {
     /*
@@ -21,12 +21,26 @@ class ProductFactory {
 
         return new productClass(payload).createProduct()
     }
+    // PUT //
+    static async publishProductByShop({ product_shop, product_id }) {
+        return await publishProductByShop({ product_shop, product_id })
+    }
 
+    // END PUT //
+
+    //query
     static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
         const query = { product_shop, isDraft: true }
 
         return await findAllDraftsForShop({ query, limit, skip })
     }
+
+    static async findAllPublishForShop({ product_shop, limit = 50, skip = 0 }) {
+        const query = { product_shop, isPublish: true }
+
+        return await findAllPublishForShop({ query, limit, skip })
+    }
+
 }
 
 /*
