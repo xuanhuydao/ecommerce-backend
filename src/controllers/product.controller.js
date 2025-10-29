@@ -83,6 +83,15 @@ class ProductController {
         }).send(res)
     }
 
+    findProduct = async (req, res, next) => {
+        new Successresponse({
+            message: 'Get list findProduct success !',
+            metadata: await ProductServiceV2.findProduct({
+                product_id: req.params.product_id})
+        }).send(res)
+    }
+
+
     //end query
 }
 

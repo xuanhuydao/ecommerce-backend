@@ -1,7 +1,7 @@
 'use strict'
 
 const { slice } = require('lodash')
-const { getSelectData } = require('../../utils')
+const { getSelectData, getUnSelectData } = require('../../utils')
 const { product, electronic, clothing, furniture } = require('../product.model')
 const { Types } = require('mongoose')
 
@@ -26,6 +26,10 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
     .lean()
 
     return products
+}
+
+const findProduct = async ({ product_id, unselect = [] }) => {
+    return await product.findById(product_id).select(getUnSelectData(unselect))
 }
 
 const searchProductByUser = async ({ keySearch }) => {
@@ -88,5 +92,6 @@ module.exports = {
     findAllPublishForShop,
     unPublishProductByShop,
     searchProductByUser,
-    findAllProducts
+    findAllProducts,
+    findProduct
 }
