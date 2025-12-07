@@ -1,6 +1,6 @@
 const { model, Schema, Types } = require('mongoose')
 
-const DOCUMNET_NAME = 'Discount'
+const DOCUMENT_NAME = 'Discount'
 const COLLECTION_NAME = 'discounts'
 
 const discountSchema = new Schema({
@@ -27,5 +27,5 @@ const discountSchema = new Schema({
 })
 
 module.exports = {
-    Discount: model(DOCUMNET_NAME, discountSchema)
+    Discount: model(DOCUMENT_NAME, discountSchema)
 }
