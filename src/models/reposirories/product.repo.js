@@ -1,7 +1,7 @@
 'use strict'
 
 const { slice } = require('lodash')
-const { getSelectData, getUnSelectData } = require('../../utils')
+const { getSelectData, getUnSelectData, convertToObjectIdMongodb } = require('../../utils')
 const { product, electronic, clothing, furniture } = require('../product.model')
 const { Types } = require('mongoose')
 
@@ -91,6 +91,10 @@ const queryProduct = async ({ query, limit, skip }) => {
         .exec()
 }
 
+const getProductById = async ({ productId }) => {
+    return await product.findOne({ _id: convertToObjectIdMongodb(productId) }).lean()
+}
+
 module.exports = {
     findAllDraftsForShop,
     publishProductByShop,
@@ -99,5 +103,6 @@ module.exports = {
     searchProductByUser,
     findAllProducts,
     findProduct,
-    updateProductById
+    updateProductById,
+    getProductById
 }

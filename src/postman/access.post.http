@@ -50,3 +50,9 @@ authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGRhYjM5ZTIw
   }
 }
 
+###getListCart
+GET  {{url_dev}}/cart?userId=1001
+Content-Type: application/json
+x-api-key: 227b3949a8b6c94c0b0c08bd8f1693a06c42dba466b1f1fb8fa8f5125e39a13c72d0398bd1497bf02ec932085d23cbbe9b6c0f19be839bc8ad0497501d559b14
+x-client-id: 68dab39e20d5483042ffae59
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGRhYjM5ZTIwZDU0ODMwNDJmZmFlNTkiLCJlbWFpbCI6InNob3B0aXBqc0BnbWFpbC5jb20iLCJpYXQiOjE3NjUyMDM3NDksImV4cCI6MTc2NTM3NjU0OX0.y_fVBjQ_IxRvGS5SrPhpLeO-CzteWnX2G0z8wriZW4Y
