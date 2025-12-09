@@ -47,8 +47,16 @@ const deleteUserCart = async ({ userId, productId }) => {
 
     return deleteCart
 }
+
+const findCartById = async ({cartId}) => {
+    return await Cart.findOne({
+        _id: convertToObjectIdMongodb(cartId),
+        cart_state: 'active'
+    }).lean()
+}
 module.exports = {
     createUserCart,
     updateUserCartQuantity,
-    deleteUserCart
+    deleteUserCart,
+    findCartById
 }

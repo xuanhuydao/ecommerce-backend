@@ -46,7 +46,7 @@ class CartService {
     static async addtoCartV2({ userId, shop_order_ids }) {
         const  [{productId, quantity, old_quantity, shopId}]  = shop_order_ids.item_products
         //check product
-        const foundProduct = await getProductById({ productId })
+        const foundProduct = await getProductById( productId )
         if (!foundProduct) throw new NotFoundError('Product not exists')
 
         //compare 
